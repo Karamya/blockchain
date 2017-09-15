@@ -32,6 +32,7 @@ def create_genesis_block():
     }, "0")
 
 
+
 # A completely random address of the owner of this node
 miner_address = "q3nf394hjg-random-miner-address-34nf3i4nflkn3oi"
 # This node's blockchain copy
