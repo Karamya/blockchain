@@ -14,15 +14,15 @@ class Block:
         self.previous_hash = previous_hash
         self.hash = self.hash_block()
 
+    def __str__(self):
+        return 'Block: ' + str(self.index) + ', data: ' + str(self.data)  + ', prevHash: ' + str(self.previous_hash) + ', hash: '+ str(self.hash)
+
     def hash_block(self):
         content_to_hash = (str(self.index) +
                            str(self.timestamp) +
                            str(self.data) +
                            str(self.previous_hash))
         return hasher.sha256(content_to_hash.encode("utf-16")).hexdigest()
-
-    def __str__(self):
-        return 'Block: ' + str(self.index) + ', data: ' + str(self.data) + ', hash: '+ str(self.hash) + ', prevHash: ' + str(self.previous_hash)
 
 
 class Blockchain:
@@ -31,8 +31,8 @@ class Blockchain:
     def __init__(self):
         self.chain = []
         genesis_block = self.create_genesis_block()
-        #self.chain.append(genesis_block)
-        # use mining 
+        self.chain.append(genesis_block)
+        # use mining
 
         #for test reason
         self.print_complete_chain()
@@ -45,7 +45,7 @@ class Blockchain:
         return Block(0,  # index
                      date.datetime.now(),  # timestamp
                      {
-                         "VIN": None,
+                         "vin": None,
                          "metadata": {
                              "Owner": None,
                              "Mileage": None
@@ -54,24 +54,28 @@ class Blockchain:
                      },  # data
                      "0")  # previous hash
 
-    def add_create_block(self):
-
+    def add_create_block(self, data):
+        self.index = self.chain[-1].index + 1
+        self.current_time = date.datetime.now()
+        self.previous_hash = self.chain[-1].hash
+        self.chain.append(Block(self.index,
+                                self.current_time,
+                                data,
+                                self.previous_hash
+                                ))
         return
 
-
-    # create block
-    """def add_new_block(self):
-        new_index = self.chain[-1] + 1;
-
-        block = Block(new_index, timestamp, data, previous_hash)
-
-        # add to chain
-        added_block = self.blockchain.add_new_block(block)
-
-        # mine new block
-        self.blockchain.mine(added_block)
+    def transfer_block(self, data):
+        self.index = self.chain[-1].index + 1
+        self.current_time = date.datetime.now()
+        self.previous_hash = self.chain[-1].hash
+        self.chain.append(Block(self.index,
+                                self.current_time,
+                                data,
+                                self.previous_hash
+                                ))
         return
-    """
+
     # helper method
     def print_complete_chain(self):
         for block in self.chain:
