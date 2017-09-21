@@ -1,7 +1,7 @@
 # @Author: karthick
 # @Date:   2017-09-21T12:12:12+02:00
 # @Last modified by:   karthick
-# @Last modified time: 2017-09-21T17:01:49+02:00
+# @Last modified time: 2017-09-21T17:20:06+02:00
 
 from car_pass import CarPass
 from flask import Flask
@@ -75,10 +75,9 @@ def consensus():
 @node.route('/mine', methods=["GET"])
 def mine():
     print(this_node_transaction)
-    last_block = blockchain[-1]
-    new_block_index = last_block.index + 1
-    new_block_timestamp = date.date
-    return
+    return json.dumps(
+            this_node_transaction[0]
+        )
 
 
 
