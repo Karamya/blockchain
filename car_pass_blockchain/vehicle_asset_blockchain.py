@@ -10,9 +10,9 @@ import logging
 import hashlib
 import datetime as date
 node = Flask(__name__)
-
 logging.getLogger("flask_ask").setLevel(logging.DEBUG)
 
+peer_nodes = ['http://localhost:5000', 'http://localhost:5001']
 
 class Block:
     def __init__(self, index, timestamp, data, previous_hash):
@@ -101,3 +101,4 @@ class Blockchain:
     def print_complete_chain(self):
         for block in self.chain:
             print(str(block) + ', ')
+
