@@ -1,16 +1,24 @@
 from vehicle_asset_blockchain import Block
 from vehicle_asset_blockchain import Blockchain
+from flask import Flask, jsonify
+
+peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/']
+
+
 
 class CarPass:
 
+
+
     def __init__(self):
         # initialize blockchain car storage
-        self.blockchain = Blockchain()
+        self.blockchain = Blockchain() # TODO: change to node instance
+
         return
 
     # Add new cars
     def add_car(self, vin, initial_owner, initial_mileage):
-        for block in self.blockchain.chain[::-1]:
+        for block in self.blockchain.chain[::-1]: # get latest block / get all blocks / call consensus
             if block.data["vin"] == vin:
                 print("A car with the same VIN number is present")
                 print("New car not added")
@@ -23,7 +31,7 @@ class CarPass:
             }
         }
 
-        self.blockchain.add_create_block(data)
+        self.blockchain.add_create_block(data) # call node server for adding blocks
 
         return
 
