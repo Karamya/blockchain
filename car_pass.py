@@ -75,20 +75,4 @@ class CarPass:
 
 
 
-carpass = CarPass()
-carpass.add_car('1234567890123451', 'Karthick', 0)
-carpass.add_car('1234567890123452', 'Deniel', 0)
-carpass.add_car('1234567890123453', 'qwerty', 0)
-carpass.add_car('1234567890123454', 'qwertz', 0)
-carpass.change_owner('1234567890123451', 'Deniel', 12)
-carpass.change_owner('1234567890123452', 'Karthick', 22)
-carpass.change_owner('1234567890123453', 'qwertz', 32)
-carpass.change_owner('1234567890123454', 'qwerty', 42)
-carpass.change_owner('1234567890123451', 'Deniel', 1)
-carpass.change_owner('1234567890123452', 'Karthick', 2)
-carpass.change_owner('1234567890123453', 'qwertz', 30)
-carpass.change_owner('1234567890123454', 'qwerty', 45)
-carpass.set_mileage('1234567890123451', 100)
-carpass.set_mileage('1234567890123452', 400)
-carpass.set_mileage('1234567890123453', 334)
-carpass.set_mileage('1234567890123454', 345)
+
