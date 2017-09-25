@@ -22,7 +22,7 @@ class Block:
         self.merkle_root = self.double_sha_256(str(self.data))
         self.previous_hash = previous_hash
         self.hash = self.proof_of_work()
-        self.nonce = 0
+        #self.nonce = 0
 
     def __str__(self):
         return 'Block: ' + str(self.index) + ', data: ' + str(self.data)  + ', prevHash: ' + str(self.previous_hash) + ', hash: '+ str(self.hash)
