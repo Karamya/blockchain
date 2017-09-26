@@ -12,7 +12,6 @@ import datetime as date
 node = Flask(__name__)
 logging.getLogger("flask_ask").setLevel(logging.DEBUG)
 
-peer_nodes = ['http://localhost:5000', 'http://localhost:5001']
 
 class Block:
     def __init__(self, index, timestamp, data, previous_hash):
@@ -25,7 +24,7 @@ class Block:
         #self.nonce = 0
 
     def __str__(self):
-        return 'Block: ' + str(self.index) + ', data: ' + str(self.data)  + ', prevHash: ' + str(self.previous_hash) + ', hash: '+ str(self.hash)
+        return 'Block: ' + str(self.index) + ', data: ' + str(self.data)  + ', prevHash: ' + str(self.previous_hash) + ', hash: '+ str(self.hash) + ", nonce: " + str(self.nonce)
 
     def hash_merkle_root(self):
         return self.double_sha_256(self.data)

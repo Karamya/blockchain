@@ -20,35 +20,13 @@ runner = Runner(node)
 carpass = CarPass()
 block_chain = []
 
-peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/']
-
-
-@node.route('/transaction', methods=['POST'])
-def transaction():
-    new_transaction = request.get_json()
-    print("New transaction")
-    current_port = request.url_root
-    print("Current host is {}".format(current_port))
-    transaction_type = new_transaction['type']
-    transaction_data = new_transaction['data']
-    print("TYPE: {}".format(transaction_type))
-    print("DATA: {}".format(transaction_data))
-    port_for_mining = random.choice(peer_nodes)
-    print("The mining port for the current transaction will be {}".format(port_for_mining))
-    if port_for_mining == current_port:
-        print("It's the same port", current_port)
-        mine()
-    else:
-        print("It is a different port", port_for_mining)
-        headers = {'Content-Type': 'application/json'}
-        mining_url = port_for_mining + "mine"
-        requests.post(mining_url, headers=headers, json=new_transaction)
-    return "Transaction successful"
+peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/', 'http://localhost:5002/']
 
 
 @node.route('/mine', methods=["POST"])
 def mine():
     transaction_to_mine = request.get_json()
+    print(transaction_to_mine)
     if transaction_to_mine["type"] == "add_car":
         vin = transaction_to_mine["data"]["vin"]
         owner = transaction_to_mine["data"]["owner"]
@@ -133,7 +111,7 @@ def get_blocks():
     print("\n\n\n",blockchain_from_all_nodes, "\n\n\n")
     longest_chain = consensus(blockchain_from_all_nodes)
     print("\nThe longest chain is \n", longest_chain, "and of type ", type(longest_chain))
-    blocklist = ""
+    blocklist = []
     for block in longest_chain:
         block_index = str(block["index"])
         block_timestamp = str(block["timestamp"])
@@ -141,20 +119,18 @@ def get_blocks():
         block_previous_hash = str(block["previous_hash"])
         block_hash = str(block["hash"])
         block_nonce = str(block["nonce"])
-        assembled = json.dumps(
-            {
+        assembled = {
+
                 "index": block_index,
                 "timestamp": block_timestamp,
                 "data": block_data,
                 "previous_hash": block_previous_hash,
                 "hash": block_hash,
                 "nonce": block_nonce
-            }) + "\n"
-        if blocklist == "":
-            blocklist = assembled
-        else:
-            blocklist += assembled
-    return blocklist  # + "\n\n"
+            }
+        blocklist.append(assembled)
+    print(len(blocklist))
+    return json.dumps(blocklist)  # + "\n\n"
 
 
 
