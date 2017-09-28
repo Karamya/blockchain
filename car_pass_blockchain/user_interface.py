@@ -62,12 +62,11 @@ peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/', 'http://localh
 
 def send_json(vin, mileage, owner=None):
     mining_node = random.choice(peer_nodes) + "mine"
-    data = {"type": sys.argv[1],
-            "data": {"vin": vin,
-                     "owner": owner,
-                     "mileage": mileage,
-                     "timestamp": str(datetime.now()),
-                     }
+    data = {"transaction_type": sys.argv[1],
+            "timestamp": str(datetime.now()),
+            "vin": vin,
+            "owner": owner,
+            "mileage": mileage,
             }
     data_json = json.dumps(data)
     print(mining_node)

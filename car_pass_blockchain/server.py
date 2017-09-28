@@ -28,22 +28,22 @@ def mine():
     transaction_to_mine = request.get_json()
     print(transaction_to_mine)
     print("\n\n The current blockchain is \n\n", carpass.blockchain.chain)
-    if transaction_to_mine["type"] == "add_car":
-        timestamp = transaction_to_mine["data"]["timestamp"]
-        vin = transaction_to_mine["data"]["vin"]
-        owner = transaction_to_mine["data"]["owner"]
-        mileage = transaction_to_mine["data"]["mileage"]
+    if transaction_to_mine["transaction_type"] == "add_car":
+        timestamp = transaction_to_mine["timestamp"]
+        vin = transaction_to_mine["vin"]
+        owner = transaction_to_mine["owner"]
+        mileage = transaction_to_mine["mileage"]
         carpass.add_car(timestamp, vin, owner, mileage)
-    elif transaction_to_mine["type"] == "change_owner":
-        timestamp = transaction_to_mine["data"]["timestamp"]
-        vin = transaction_to_mine["data"]["vin"]
-        owner = transaction_to_mine["data"]["owner"]
-        mileage = transaction_to_mine["data"]["mileage"]
+    elif transaction_to_mine["transaction_type"] == "change_owner":
+        timestamp = transaction_to_mine["timestamp"]
+        vin = transaction_to_mine["vin"]
+        owner = transaction_to_mine["owner"]
+        mileage = transaction_to_mine["mileage"]
         carpass.change_owner(timestamp, vin, owner, mileage)
-    elif transaction_to_mine["type"] == "set_mileage":
-        timestamp = transaction_to_mine["data"]["timestamp"]
-        vin = transaction_to_mine["data"]["vin"]
-        mileage = transaction_to_mine["data"]["mileage"]
+    elif transaction_to_mine["transaction_type"] == "set_mileage":
+        timestamp = transaction_to_mine["timestamp"]
+        vin = transaction_to_mine["vin"]
+        mileage = transaction_to_mine["mileage"]
         carpass.set_mileage(timestamp, vin, mileage)
     else:
         "Invalid data, so no mining occurred"
