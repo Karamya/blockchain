@@ -27,6 +27,7 @@ peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/', 'http://localh
 def mine():
     transaction_to_mine = request.get_json()
     print(transaction_to_mine)
+    carpass.blockchain.chain = consensus()
     print("\n\n The current blockchain is \n\n", carpass.blockchain.chain)
     if transaction_to_mine["transaction_type"] == "add_car":
         timestamp = transaction_to_mine["timestamp"]
@@ -72,12 +73,6 @@ def get_all_blockchains():
     print("\n\n Blockchains from all nodes are\n", all_blockchains)
     return all_blockchains
 
-def update_chains():
-    # Updates the blockchain of all the nodes based on the consensus
-    for node_url in peer_nodes:
-        print(get_chain)
-    return
-
 
 def consensus():
     # Get the blocks from other nodes
@@ -93,51 +88,18 @@ def consensus():
 
 @node.route("/get_chain")
 def get_chain():
+    print("Current node is ", request.url_root)
     current_chain = carpass.blockchain.chain
-    current_blocklist = []
-    for block in current_chain:
-        block_index = str(block.index)
-        block_data = str(block.data)
-        block_previous_hash = str(block.previous_hash)
-        block_hash = str(block.hash)
-        block_nonce = str(block.nonce)
-        assembled = {
-                "index": block_index,
-                "data": block_data,
-                "previous_hash": block_previous_hash,
-                "hash": block_hash,
-                "nonce": block_nonce
-            }
-        current_blocklist.append(assembled)
-    print(len(current_blocklist))
-    return json.dumps(current_blocklist)
+    return json.dumps(current_chain)
 
 
 @node.route('/blocks', methods=['GET', 'POST'])
 def get_blocks():
     longest_chain = consensus()
     print("\nThe longest chain is \n", longest_chain, "and of type ", type(longest_chain))
-    blocklist = []
     for block in longest_chain:
-        block_index = str(block["index"])
-        block_data = str(block["data"])
-        block_previous_hash = str(block["previous_hash"])
-        block_hash = str(block["hash"])
-        block_nonce = str(block["nonce"])
-        assembled = {
-
-                "index": block_index,
-                "data": block_data,
-                "previous_hash": block_previous_hash,
-                "hash": block_hash,
-                "nonce": block_nonce
-            }
-        blocklist.append(assembled)
-    print(len(blocklist))
-    return json.dumps(blocklist)  # + "\n\n"
-
-
-
+        print(block)
+    return json.dumps(longest_chain)  # + "\n\n"
 
 
 if __name__ == "__main__":
