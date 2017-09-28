@@ -20,49 +20,32 @@ runner = Runner(node)
 carpass = CarPass()
 block_chain = []
 
-peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/']
-
-
-@node.route('/transaction', methods=['POST'])
-def transaction():
-    new_transaction = request.get_json()
-    print("New transaction")
-    current_port = request.url_root
-    print("Current host is {}".format(current_port))
-    transaction_type = new_transaction['type']
-    transaction_data = new_transaction['data']
-    print("TYPE: {}".format(transaction_type))
-    print("DATA: {}".format(transaction_data))
-    port_for_mining = random.choice(peer_nodes)
-    print("The mining port for the current transaction will be {}".format(port_for_mining))
-    if port_for_mining == current_port:
-        print("It's the same port", current_port)
-        mine()
-    else:
-        print("It is a different port", port_for_mining)
-        headers = {'Content-Type': 'application/json'}
-        mining_url = port_for_mining + "mine"
-        requests.post(mining_url, headers=headers, json=new_transaction)
-    return "Transaction successful"
+peer_nodes = ['http://localhost:5000/', 'http://localhost:5001/', 'http://localhost:5002/']
 
 
 @node.route('/mine', methods=["POST"])
 def mine():
     transaction_to_mine = request.get_json()
-    if transaction_to_mine["type"] == "add_car":
-        vin = transaction_to_mine["data"]["vin"]
-        owner = transaction_to_mine["data"]["owner"]
-        mileage = transaction_to_mine["data"]["mileage"]
-        carpass.add_car(vin, owner, mileage)
-    elif transaction_to_mine["type"] == "change_owner":
-        vin = transaction_to_mine["data"]["vin"]
-        owner = transaction_to_mine["data"]["owner"]
-        mileage = transaction_to_mine["data"]["mileage"]
-        carpass.change_owner(vin, owner, mileage)
-    elif transaction_to_mine["type"] == "set_mileage":
-        vin = transaction_to_mine["data"]["vin"]
-        mileage = transaction_to_mine["data"]["mileage"]
-        carpass.set_mileage(vin, mileage)
+    print(transaction_to_mine)
+    carpass.blockchain.chain = consensus()
+    print("\n\n The current blockchain is \n\n", carpass.blockchain.chain)
+    if transaction_to_mine["transaction_type"] == "add_car":
+        timestamp = transaction_to_mine["timestamp"]
+        vin = transaction_to_mine["vin"]
+        owner = transaction_to_mine["owner"]
+        mileage = transaction_to_mine["mileage"]
+        carpass.add_car(timestamp, vin, owner, mileage)
+    elif transaction_to_mine["transaction_type"] == "change_owner":
+        timestamp = transaction_to_mine["timestamp"]
+        vin = transaction_to_mine["vin"]
+        owner = transaction_to_mine["owner"]
+        mileage = transaction_to_mine["mileage"]
+        carpass.change_owner(timestamp, vin, owner, mileage)
+    elif transaction_to_mine["transaction_type"] == "set_mileage":
+        timestamp = transaction_to_mine["timestamp"]
+        vin = transaction_to_mine["vin"]
+        mileage = transaction_to_mine["mileage"]
+        carpass.set_mileage(timestamp, vin, mileage)
     else:
         "Invalid data, so no mining occurred"
     return json.dumps(
@@ -70,30 +53,31 @@ def mine():
     ) + "\n\n"
 
 
-def find_new_chains():
+def get_all_blockchains():
     # Get the blockchains of every other node
-    other_chains = []
+    all_blockchains = []
     for node_url in peer_nodes:
         print(node_url, request.url_root)
         # Get their chains using a GET request
         if node_url != request.url_root:
             print("\n\nrequesting another node ", node_url)
             block = requests.get(node_url + "get_chain").content
-            #block = block.replace("'", "\"")
             block = json.loads(block)
         # Convert the JSON object to a python dictionary
         # Add it to our list
             print("the blockchain is of type ", type(block))
-            other_chains.append(block)
+            all_blockchains.append(block)
         else:
             print("\n\nrequesting own node ", node_url)
-            other_chains.append(json.loads(get_chain()))
-    return other_chains
+            all_blockchains.append(json.loads(get_chain()))
+    print("\n\n Blockchains from all nodes are\n", all_blockchains)
+    return all_blockchains
 
 
-def consensus(blockchain_from_all_nodes):
+def consensus():
     # Get the blocks from other nodes
     print("calling consensus")
+    blockchain_from_all_nodes = get_all_blockchains()
     # If our chain isn't longest, then we store the longest chain
     longest_chain = []
     for chain in blockchain_from_all_nodes:
@@ -104,60 +88,18 @@ def consensus(blockchain_from_all_nodes):
 
 @node.route("/get_chain")
 def get_chain():
+    print("Current node is ", request.url_root)
     current_chain = carpass.blockchain.chain
-    current_blocklist = []
-    for block in current_chain:
-        block_index = str(block.index)
-        block_timestamp = str(block.timestamp)
-        block_data = str(block.data)
-        block_previous_hash = str(block.previous_hash)
-        block_hash = str(block.hash)
-        block_nonce = str(block.nonce)
-        assembled = {
-
-                "index": block_index,
-                "timestamp": block_timestamp,
-                "data": block_data,
-                "previous_hash": block_previous_hash,
-                "hash": block_hash,
-                "nonce": block_nonce
-            }
-        current_blocklist.append(assembled)
-    print(len(current_blocklist))
-    return json.dumps(current_blocklist)
+    return json.dumps(current_chain)
 
 
 @node.route('/blocks', methods=['GET', 'POST'])
 def get_blocks():
-    blockchain_from_all_nodes = find_new_chains()  # consensus()  #carpass.blockchain.chain
-    print("\n\n\n",blockchain_from_all_nodes, "\n\n\n")
-    longest_chain = consensus(blockchain_from_all_nodes)
+    longest_chain = consensus()
     print("\nThe longest chain is \n", longest_chain, "and of type ", type(longest_chain))
-    blocklist = ""
     for block in longest_chain:
-        block_index = str(block["index"])
-        block_timestamp = str(block["timestamp"])
-        block_data = str(block["data"])
-        block_previous_hash = str(block["previous_hash"])
-        block_hash = str(block["hash"])
-        block_nonce = str(block["nonce"])
-        assembled = json.dumps(
-            {
-                "index": block_index,
-                "timestamp": block_timestamp,
-                "data": block_data,
-                "previous_hash": block_previous_hash,
-                "hash": block_hash,
-                "nonce": block_nonce
-            }) + "\n"
-        if blocklist == "":
-            blocklist = assembled
-        else:
-            blocklist += assembled
-    return blocklist  # + "\n\n"
-
-
-
+        print(block)
+    return json.dumps(longest_chain)  # + "\n\n"
 
 
 if __name__ == "__main__":
