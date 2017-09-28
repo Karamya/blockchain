@@ -3,14 +3,8 @@
 # @Last modified by:   karthick
 # @Last modified time: 2017-09-21T11:52:17+02:00
 
-from flask import Flask, request
-import json
-import requests
-import logging
 import hashlib
 import datetime as date
-node = Flask(__name__)
-logging.getLogger("flask_ask").setLevel(logging.DEBUG)
 
 
 class Block:
@@ -24,7 +18,7 @@ class Block:
         #self.nonce = 0
 
     def __str__(self):
-        return 'Block: ' + str(self.index) + ', data: ' + str(self.data)  + ', prevHash: ' + str(self.previous_hash) + ', hash: '+ str(self.hash) + ", nonce: " + str(self.nonce)
+        return 'Block: ' + str(self.index) + ', data: ' + str(self.data) + ', prevHash: ' + str(self.previous_hash) + ', hash: '+ str(self.hash) + ", nonce: " + str(self.nonce)
 
     def hash_merkle_root(self):
         return self.double_sha_256(self.data)
@@ -63,31 +57,22 @@ class Blockchain:
         # Manually construct a block with
         # index zero and arbitrary previous hash
         return Block(0,  # index
-                     date.datetime.now(),  # timestamp
+                     '2017-08-01 08:00:00.000000',  # timestamp
                      {
                          "vin": None,
+                         "timestamp": '2017-08-01 08:00:00.000000',  # timestamp
                          "metadata": {
-                             "Owner": None,
-                             "Mileage": None
-                         }
+                                 "Owner": None,
+                                 "Mileage": None
+                             }
 
                      },  # data
                      "0")  # previous hash
 
-    def add_create_block(self, data):
+    def add_block(self, data):
         self.index = self.chain[-1].index + 1
-        self.current_time = date.datetime.now()
-        self.previous_hash = self.chain[-1].hash
-        self.chain.append(Block(self.index,
-                                self.current_time,
-                                data,
-                                self.previous_hash
-                                ))
-        return
-
-    def transfer_block(self, data):
-        self.index = self.chain[-1].index + 1
-        self.current_time = date.datetime.now()
+        print("the data is of type", type(data))
+        self.current_time = data["timestamp"]
         self.previous_hash = self.chain[-1].hash
         self.chain.append(Block(self.index,
                                 self.current_time,
@@ -100,4 +85,5 @@ class Blockchain:
     def print_complete_chain(self):
         for block in self.chain:
             print(str(block) + ', ')
+
 

@@ -3,6 +3,7 @@ import sys
 import json
 import requests
 import random
+from datetime import datetime
 import argcomplete # for autocompletion of argument parsers
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
@@ -64,7 +65,8 @@ def send_json(vin, mileage, owner=None):
     data = {"type": sys.argv[1],
             "data": {"vin": vin,
                      "owner": owner,
-                     "mileage": mileage
+                     "mileage": mileage,
+                     "timestamp": str(datetime.now()),
                      }
             }
     data_json = json.dumps(data)
@@ -94,3 +96,4 @@ elif sys.argv[1] == "set_mileage":
     send_json(vin=new_vin, mileage=new_mileage)
 else:
     "transaction type unknown"
+
